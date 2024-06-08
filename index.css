@@ -6,6 +6,9 @@
   box-sizing: border-box;
   font-family: "Inter", sans-serif !important;
 }
+input {
+  box-shadow: 0px 2px 5px 0px rgba(89, 96, 120, 0.1);
+}
 
 body {
   width: 100vw;
@@ -25,8 +28,31 @@ body {
   margin-top: 21px;
   overflow-x: hidden;
 }
+.del {
+  display: flex !important;
+  justify-content: center;
+  align-items: center;
+  margin-left: 15px;
+}
+.filter-search {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.filter_btn {
+  top: 16px;
+  left: 20px;
+  padding: 8px 12px 8px 12px;
+  gap: 8px;
+  border-radius: 6px;
+  opacity: 0px;
+  margin-left: 10px;
+  border: 0px solid !important;
+  box-shadow: 0px 2px 5px 0px rgba(89, 96, 120, 0.1);
+}
 
 #addCustomerButton {
+  font-weight: 500;
   background-color: #2264e5;
   cursor: pointer;
   color: white;
@@ -38,7 +64,22 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-right: 10px;
+  margin-right: 2rem;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+.search {
+  position: relative;
+  margin-left: 10px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+.search img {
+  padding-left: 30px;
+  background-image: url("search.svg");
+  background-size: 20px;
+  background-repeat: no-repeat;
+  background-position: 5px center;
 }
 
 .table {
@@ -48,6 +89,7 @@ body {
 
 #dataTable {
   border-collapse: collapse;
+  width: 100%;
 }
 
 thead {
@@ -73,7 +115,13 @@ th {
   font-weight: 600;
   line-height: 16px;
   letter-spacing: 0.04em;
+  text-align: center;
+}
+.th_left {
   text-align: left;
+}
+.th_center {
+  text-align: center;
 }
 
 #pagination {
@@ -82,11 +130,11 @@ th {
 }
 
 .status {
-  /* padding: 10px 10px; */
+  font-size: 12px;
+  cursor: pointer;
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 17px;
 }
 
 .open {
@@ -95,11 +143,17 @@ th {
   border-radius: 20px;
   height: 20px;
 }
+.open:hover {
+  border: 1px solid indigo;
+}
 .paid {
   background-color: #e1fcef;
   color: #14804a;
   border-radius: 20px;
   height: 20px;
+}
+.paid:hover {
+  border: 1px solid #14804a;
 }
 .inactive {
   background-color: #e9edf5;
@@ -107,11 +161,17 @@ th {
   border-radius: 20px;
   height: 20px;
 }
+.inactive:hover {
+  border: 1px solid #5a6376;
+}
 .due {
   background-color: #faf0f3;
   color: #d12953;
   border-radius: 20px;
   height: 20px;
+}
+.due:hover {
+  border: 1px solid #d12953;
 }
 
 .negative {
@@ -175,20 +235,9 @@ tr:hover .row-options {
 .items {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 10px;
-  padding-top: 10px;
-}
 
-.search {
-  position: relative;
-  margin-left: 10px;
-}
-.search img {
-  padding-left: 30px;
-  background-image: url("search.svg");
-  background-size: 20px;
-  background-repeat: no-repeat;
-  background-position: 5px center;
+  padding-top: 10px;
+  background: #f4f7fcbf;
 }
 
 .tableBottom {
@@ -198,6 +247,8 @@ tr:hover .row-options {
   width: 95vw;
   margin: 15px 0;
   padding-bottom: 15px;
+  backdrop-filter: blur(10px); /* Adjust the blur radius as needed */
+  background-color: rgba(255, 255, 255, 0.5); /* Adjust the opacity as needed */
 }
 #pagination {
   margin-left: 15px;
@@ -260,23 +311,162 @@ tr:hover .row-options {
 .description-class {
   color: #464f60;
   font-size: 14px;
+
+  width: 238px;
+  height: 40px;
+  top: 12px;
+  left: 282px;
+  gap: 0px;
+  opacity: 0px;
 }
 .amount1-class {
+  color: #464f60;
+
   font-size: 14px;
+  width: 100px;
+  text-align: right;
 }
 .amount2-class {
   font-size: 14px;
+  width: 100px;
+  text-align: right;
 }
 .amount3-class {
+  color: #464f60;
   font-size: 14px;
+  width: 100px;
+  text-align: right;
 }
 .cad-class {
+  width: 100px;
   font-size: 12px;
   color: #687182;
+  text-align: right;
 }
 .red-class {
-  color: red !important;
+  color: #d12953 !important;
 }
 .green-class {
-  color: green !important;
+  color: #14804a !important;
+}
+
+.selected {
+  background-color: rgba(235, 240, 250, 1);
+}
+
+/* FORM  */
+
+/* Centered form pop-up styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  backdrop-filter: blur(5px);
+}
+
+.edit-form {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: auto; /* Increased width to fit two inputs side by side */
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.edit-form .form-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px; /* Added gap between the input fields */
+}
+
+.edit-form label {
+  font-weight: bold;
+  flex: 1;
+}
+
+.edit-form input[type="text"] {
+  flex: 2;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.edit-form button[type="submit"] {
+  padding: 10px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.edit-form button[type="submit"]:hover {
+  background-color: #218838;
+}
+
+.close-button {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  padding: 10px;
+  margin-top: 10px;
+  align-self: flex-end;
+}
+
+.close-button:hover {
+  background-color: #c82333;
+}
+
+/* Add Customer button styles */
+.add-customer-button {
+  padding: 10px 20px;
+  margin: 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.add-customer-button:hover {
+  background-color: #0056b3;
+}
+
+/* Pagination styles */
+#pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.pagination-button {
+  margin: 0 5px;
+  padding: 10px 15px;
+  border: 1px solid #007bff;
+  border-radius: 5px;
+  background-color: white;
+  color: #007bff;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.pagination-button:hover {
+  background-color: #007bff;
+  color: white;
+}
+
+.pagination-button.active {
+  background-color: #007bff;
+  color: white;
 }

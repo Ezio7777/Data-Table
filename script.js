@@ -29,13 +29,10 @@ document.addEventListener("DOMContentLoaded", function () {
       selectCheckbox.type = "checkbox";
       selectCheckbox.name = "selectedRow";
       selectCell.appendChild(selectCheckbox);
-      var rowCheckboxes = document.querySelectorAll(
-        'td input[type="checkbox"]'
-      );
-      rowCheckboxes.forEach(function (checkbox) {
-        checkbox.addEventListener("change", function () {
-          updateDeleteButtonVisibility();
-        });
+
+      selectCheckbox.addEventListener("change", function () {
+        updateDeleteButtonVisibility();
+        toggleRowBackground(row, selectCheckbox.checked);
       });
 
       var idCell = row.insertCell();
@@ -63,22 +60,31 @@ document.addEventListener("DOMContentLoaded", function () {
       }
       descriptionCell.innerText = truncatedText;
 
-      var statusCell = row.insertCell();
-      statusCell.innerText = item.Status;
-      statusCell.classList.add("status");
+      // STATUS SECTION
 
+      var statusCell = row.insertCell();
+      var statusButton = document.createElement("div");
+      statusButton.innerText = item.Status;
+      statusButton.classList.add("status");
+
+      // Add classes based on the status
       if (item.Status === "Open") {
-        statusCell.classList.add("open");
+        statusButton.classList.add("open");
       }
       if (item.Status === "Paid") {
-        statusCell.classList.add("paid");
+        statusButton.classList.add("paid");
       }
       if (item.Status === "Inactive") {
-        statusCell.classList.add("inactive");
+        statusButton.classList.add("inactive");
       }
       if (item.Status === "Due") {
-        statusCell.classList.add("due");
+        statusButton.classList.add("due");
       }
+
+      // Append the button to the cell
+      statusCell.appendChild(statusButton);
+
+      // AMOUNT SECTION
 
       var amount1Cell = row.insertCell();
       var amount1Wrapper = document.createElement("div");
@@ -100,12 +106,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
       var amount2Value = document.createElement("p");
       amount2Value.className = "amount2-class";
-      amount2Value.innerText = "$" + item.Amount2;
 
-      // Check if the amount is less than 0 and assign the appropriate class
-      if (parseFloat(item.Amount2) < 0) {
+      // Check if the amount is less than 0 and assign the appropriate class and formatting
+      var amount2 = parseFloat(item.Amount2);
+      if (amount2 < 0) {
+        amount2Value.innerText = "-$" + Math.abs(amount2);
         amount2Value.classList.add("red-class");
       } else {
+        amount2Value.innerText = "$" + amount2;
         amount2Value.classList.add("green-class");
       }
 
@@ -116,7 +124,6 @@ document.addEventListener("DOMContentLoaded", function () {
       amount2Wrapper.appendChild(amount2Value);
       amount2Wrapper.appendChild(amount2Currency);
       amount2Cell.appendChild(amount2Wrapper);
-
       var amount3Cell = row.insertCell();
       var amount3Wrapper = document.createElement("div");
 
@@ -131,29 +138,6 @@ document.addEventListener("DOMContentLoaded", function () {
       amount3Wrapper.appendChild(amount3Value);
       amount3Wrapper.appendChild(amount3Currency);
       amount3Cell.appendChild(amount3Wrapper);
-
-      var settingsCell = row.insertCell();
-      settingsCell.innerHTML = `<span class="settings-icon">&#8942;</span>`;
-      settingsCell.classList.add("settings-cell");
-
-      settingsCell.addEventListener("mouseenter", function () {
-        var settingsIcon = this.querySelector(".settings-icon");
-        settingsIcon.style.visibility = "visible";
-      });
-
-      settingsCell.addEventListener("mouseleave", function () {
-        var settingsIcon = this.querySelector(".settings-icon");
-        settingsIcon.style.visibility = "hidden";
-      });
-      settingsCell.addEventListener("click", function (event) {
-        handleSettings(event);
-        console.log(selRow);
-        var popup = createPopup();
-        var iconRect = this.getBoundingClientRect();
-        popup.style.top = iconRect.top + "px";
-        popup.style.left = iconRect.left - 100 + "px";
-        document.body.appendChild(popup);
-      });
     }
     updatePagination();
   }
@@ -167,6 +151,8 @@ document.addEventListener("DOMContentLoaded", function () {
       cell.classList.add("positive");
     }
   }
+
+  // PAGINATION
 
   function generatePagination() {
     var pagination = document.getElementById("pagination");
@@ -189,7 +175,6 @@ document.addEventListener("DOMContentLoaded", function () {
       pagination.appendChild(pageButton);
     }
   }
-
   function updatePagination() {
     document.querySelectorAll("[data-page]").forEach(function (row) {
       row.style.display =
@@ -252,39 +237,60 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function handleAddCustomer() {
-    var form = document.createElement("form");
+    const overlay = document.createElement("div");
+    overlay.classList.add("modal-overlay");
+
+    const form = document.createElement("form");
     form.classList.add("edit-form");
 
-    var fields = [
-      "Name",
-      "Number",
-      "Description",
-      "Status",
-      "Amount1",
-      "Amount2",
-      "Amount3",
+    const fields = [
+      { label: "Name", name: "name" },
+      { label: "Number", name: "number" },
+      { label: "Description", name: "description" },
+      { label: "Status", name: "status" },
+      { label: "Rate", name: "amount1" },
+      { label: "Balance", name: "amount2" },
+      { label: "Deposit", name: "amount3" },
     ];
-    fields.forEach(function (field) {
-      var label = document.createElement("label");
-      label.textContent = field;
-      var input = document.createElement("input");
-      input.type = "text";
-      input.name = field.toLowerCase();
-      form.appendChild(label);
-      form.appendChild(input);
-    });
 
-    var submitButton = document.createElement("button");
+    for (let i = 0; i < fields.length; i += 2) {
+      const row = document.createElement("div");
+      row.classList.add("form-row");
+
+      fields.slice(i, i + 2).forEach(function (field) {
+        const label = document.createElement("label");
+        label.textContent = field.label;
+        const input = document.createElement("input");
+        input.type = "text";
+        input.name = field.name;
+        row.appendChild(label);
+        row.appendChild(input);
+      });
+
+      form.appendChild(row);
+    }
+
+    const submitButton = document.createElement("button");
     submitButton.type = "submit";
     submitButton.textContent = "Add";
     form.appendChild(submitButton);
 
-    document.body.appendChild(form);
+    const closeButton = document.createElement("button");
+    closeButton.type = "button";
+    closeButton.textContent = "Close";
+    closeButton.classList.add("close-button");
+    closeButton.addEventListener("click", function () {
+      document.body.removeChild(overlay);
+    });
+    form.appendChild(closeButton);
+
+    overlay.appendChild(form);
+    document.body.appendChild(overlay);
 
     form.addEventListener("submit", function (e) {
       e.preventDefault();
 
-      var newItem = {
+      const newItem = {
         ID: data.length + 1,
         Name: e.target.elements["name"].value,
         Number: e.target.elements["number"].value,
@@ -295,7 +301,7 @@ document.addEventListener("DOMContentLoaded", function () {
         Amount3: e.target.elements["amount3"].value,
       };
       data.push(newItem);
-      document.body.removeChild(form);
+      document.body.removeChild(overlay);
       displayData();
       generatePagination();
       updatePagination();
@@ -442,9 +448,14 @@ document.addEventListener("DOMContentLoaded", function () {
       return checkbox.checked;
     });
 
+    var filterSearchDiv = document.querySelector(".filter-search");
+    var delDiv = document.querySelector(".del");
+
     if (anyRowChecked) {
       deleteButton.style.display = "inline-block";
       searchInput.style.display = "none";
+      filterSearchDiv.style.display = "none";
+      delDiv.style.display = "inline-block";
 
       var selectedRowCount = document.querySelectorAll(
         '#dataTable td input[type="checkbox"]:checked'
@@ -455,6 +466,8 @@ document.addEventListener("DOMContentLoaded", function () {
       deleteButton.style.display = "none";
       searchInput.style.display = "inline-block";
       numSelectedRows.style.display = "none";
+      filterSearchDiv.style.display = "flex"; // or "block" depending on your layout
+      delDiv.style.display = "none";
     }
   }
 
@@ -489,6 +502,11 @@ document.addEventListener("DOMContentLoaded", function () {
     .querySelector("th:nth-child(3)")
     .addEventListener("click", function () {
       sortDataBy("Name");
+    });
+  document
+    .getElementById("status-header")
+    .addEventListener("click", function () {
+      sortDataBy("Status");
     });
 });
 function handleSettings(event) {
